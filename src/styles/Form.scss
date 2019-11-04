@@ -1,0 +1,88 @@
+.row {
+  margin:0 !important;
+  padding:0 !important;
+}
+
+.input-field {
+  width:100%;
+  border-radius: 10px;
+  margin:10px 0 !important;
+  padding:0 !important;
+  position: relative;
+
+    label {
+      left:2em !important;
+    }
+
+    input {
+      text-indent:20px;
+    }
+
+    .helper-text {
+      top:6px
+    }
+
+    input, textarea{
+      box-shadow: 4px 4px 0px rgba(37, 95, 46, 0.5) !important;
+      border: none !important;
+      background: #b5832714 !important;
+      color:#9c9f83 !important;
+      margin:0 !important;
+    }
+}
+
+.contact_email {
+  height:4.7em;
+}
+
+.formRow {
+  background:#fefbdd;
+  height:50vh;
+}
+
+.form_item {
+  text-align:center;
+  height:90%;
+  position:relative;
+}
+
+.form_inputs {
+  height:60%;
+  position:absolute;
+  width:80%;
+  left:50%;
+  top:50%;
+  transform:translate(-50%, -50%);
+}
+
+.formSubmit {
+  width:80%;
+  position:absolute !important;
+  bottom:50px;
+  left:0;
+  color:white !important;
+  background: hsla(111, 44%, 34%, 0.32) !important;
+  box-shadow:5px 6px 0px 0px #8aab84;
+    &:hover {
+        background: hsla(50,50%,55%,.7) !important;
+        box-shadow:5px 6px 0px 0px #8aab84 !important;
+    }
+}
+
+.button_1 {
+  left:0;
+}
+
+.button_2 {
+  right:0;
+}
+
+@media (max-width:600px) {
+  .form_item {
+    height:50%;
+  }
+
+  .formRow {
+    height:100vh
+  }
+}

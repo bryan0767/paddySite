@@ -1,0 +1,61 @@
+::-webkit-scrollbar {
+    width: 0px;  /* Remove scrollbar space */
+    background: transparent;  /* Optional: just make scrollbar invisible */
+}
+/* Optional: show position indicator in red */
+::-webkit-scrollbar-thumb {
+    background: #FF0000;
+}
+
+body.noScroll {
+  overflow:hidden;
+}
+
+.bottomRow {
+   position:absolute;
+   bottom:80px;
+   left:0;
+   right:0;
+   margin:0;
+   text-align:center;
+}
+
+.mainLabel {
+  color:white;
+  font-size:40px;
+  margin-bottom:50px;
+  font-weight:bold;
+}
+
+.mainInput {
+  text-indent:10px !important;
+  background:white !important;
+  color:black !important;
+  height:2.24em !important;
+  margin:0 !important;
+}
+
+.MainCarouselButtons {
+  color:white;
+  background:rgba(53, 76, 43, .7);
+    &:hover {
+      background:hsla(50,50%,55%,.7);
+    }
+}
+
+.indicator-item {
+  &.active {
+    background:hsla(50,50%,55%, .8) !important;
+  }
+}
+
+.mainSubmit {
+  color:white !important;
+  background: hsl(50,50%,55%);
+  padding:0 20px;
+    &:hover {
+      cursor: pointer;
+      background:rgba(53, 76, 43, 1) !important;
+      color:hsl(50,50%,55%) !important;
+    }
+  }

@@ -1,0 +1,20 @@
+.menuCarousel {
+  height:-webkit-fill-available;
+  width:80vw;
+  margin:0 auto;
+  overflow-y:scroll;
+    .carousel-item {
+      opacity:0 !important;
+      &.active {
+        opacity:1 !important;
+        height:fit-content;
+      }
+    }
+}
+
+.menuSlider {
+  height:30vh!important;
+    .slides {
+      height:30vh!important;
+    }
+}

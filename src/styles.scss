@@ -1,0 +1,52 @@
+@import "./styles/mainStyles";
+@import "./styles/Specials";
+@import "./styles/Events";
+@import "./styles/Form";
+@import "./styles/Footer";
+@import "./styles/Nav";
+@import "./styles/Menu";
+
+.mainCover {
+  background-size: cover;
+  background-position:center;
+  background-Repeat:no-repeat;
+  background-origin:padding-box;
+}
+
+.centerFlex {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+    .input-field input {
+      text-indent:10px !important;
+      background:white !important;
+      color:black !important;
+      height:2.24em !important;
+      margin:0 !important;
+    }
+    .input-field .helper-text {
+      display: none !important;
+    }
+}
+
+.fullScreen {
+  height:100vh !important;
+  width:100vw !important;
+}
+
+.menu {
+  margin:0px 15px;
+}
+
+.centerHorizantal {
+  position:relative;
+  left:50% !important;
+  transform:translateX(-50%);
+}
+
+.centerVertical {
+  position:relative;
+  top:50%;
+  left:0;
+  transform:translateY(-50%);
+}

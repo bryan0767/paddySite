@@ -1,0 +1,47 @@
+{
+  "name": "paddys",
+  "version": "1.0.0",
+  "description": "site for paddy macs restaurant",
+  "main": "./src/index.js",
+  "scripts": {
+    "start": "webpack --mode development --watch",
+    "dev": "webpack && webpack-dev-server --mode development --hot --watch",
+    "server": "nodemon server.js"
+  },
+  "author": "Bryan Atencia",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.2.3",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "google-maps-react": "^2.0.2",
+    "jquery": "^3.4.1",
+    "materialize-css": "^1.0.0",
+    "momentjs": "^2.0.0",
+    "mongodb": "^3.1.10",
+    "nodemailer": "^6.3.1",
+    "nodemon": "^1.18.9",
+    "react-materialize": "^3.3.4",
+    "react-redux": "^7.1.0",
+    "react-router-dom": "^5.0.1",
+    "react-router-hash-link": "^1.2.2",
+    "redux": "^4.0.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.2.3",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.4",
+    "babel-polyfill": "^6.26.0",
+    "css-loader": "^2.1.0",
+    "moment": "^2.24.0",
+    "node-sass": "^4.11.0",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.1",
+    "webpack": "^4.28.2",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.14"
+  }
+}
