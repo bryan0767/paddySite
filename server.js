@@ -19,12 +19,19 @@ MongoClient.connect(url, { useNewUrlParser: true }, (err, database) => {
    base = database.db('paddys').collection('site_data');
    reserves = database.db('paddys').collection('reservations');
    signups = database.db('paddys').collection('signups');
-   app.listen(3000, () => {console.log('paddy site with react', path.join(__dirname, './index.html'))})
+   app.listen(3000, () => {
+     console.log('paddy site with react', path.join(__dirname, '../paddys/dist'))
+   })
 })
 
 // get site data
 
-app.get("/*", (req, res) => {
+app.get("/", (req,res) => {
+  app.use(express.static(path.join(__dirname, '../paddys/dist')));
+  res.sendFile(path.join(__dirname, '../paddys/dist'), 'index.html')
+});
+
+app.get("/api/get", (req, res) => {
      base.find({_id: req.query.id}).toArray((err, data) => {
        if (err) console.error(err)
        res.json(data[0])
@@ -33,11 +40,11 @@ app.get("/*", (req, res) => {
 
 // updates sites
 
-app.put("/update", (req, res) => {
+app.put("/api/update", (req, res) => {
     base.updateOne({_id:req.body.id}, {$set: {data:req.body.data}}).catch(e => console.log(e))
 })
 
-app.post('/signup', (req, res) => {
+app.post('/api/signup', (req, res) => {
   signups.find({email:req.body.email.toLowerCase()}).toArray((err, data) => {
     if(err) console.error(err)
     else if(!data.length) {
@@ -49,7 +56,7 @@ app.post('/signup', (req, res) => {
       })
     })
 
-app.post("/reserve", (req, res) => {
+app.post("/api/reserve", (req, res) => {
   reserves.insertOne({
         name: req.body.data.appointment_name,
         size: req.body.data.appointment_size,
@@ -59,7 +66,7 @@ app.post("/reserve", (req, res) => {
     res.json(req.body.data)
   })
 
-  app.post('/contact', (req, res) => {
+  app.post('/api/contact', (req, res) => {
     // console.log(req, res, 'the stuff in the server')
   let transporter = nodeMailer.createTransport({
     service:"hotmail",

@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "description": "site for paddy macs restaurant",
   "main": "./src/index.js",
+  "proxy": "https://localhost:3000",
   "scripts": {
     "start": "webpack --mode development --watch",
     "dev": "webpack && webpack-dev-server --mode development --hot --watch",
-    "server": "nodemon server.js"
+    "server": "nodemon server.js",
+    "build": "npm install && webpack --mode production && nodemon server.js"
   },
   "author": "Bryan Atencia",
   "license": "ISC",

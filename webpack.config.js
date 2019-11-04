@@ -2,16 +2,29 @@ const path = require('path')
 
 module.exports = {
   entry: ["babel-polyfill", path.join(__dirname, "/src/index.js")],
-  mode:"development",
+  mode:"production",
   output: {
     path: path.join(__dirname, "/dist"),
-    filename: "bundle.js"
+    // publicPath: "/",
+    filename: "[name].js"
+  },
+  optimization: {
+    minimize: true,
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]/,
+          name: "vendors",
+          chunks: "all"
+        }
+      }
+    }
   },
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
-        exclude: /node_modules/,
+        exclude: /[\\/]node_modules[\\/]/,
         use: {
           loader: "babel-loader"
         }
@@ -25,14 +38,14 @@ module.exports = {
   devServer: {
     publicPath: '/dist/',
     historyApiFallback: true,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
-        pathRewrite: {'^/api' : ''},
-        secure: false,
-        changeOrigin: true
-      }
-    }
+    // proxy: {
+    //   '/api': {
+    //     target: 'http://localhost:3000',
+    //     pathRewrite: {'^/api' : ''},
+    //     secure: false,
+    //     changeOrigin: true
+    //   }
+    // }
   },
   resolve: {
        extensions: [".js", ".jsx"]
