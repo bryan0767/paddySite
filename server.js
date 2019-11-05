@@ -8,6 +8,7 @@ let app = express()
 
 app.use(body.json())
 app.use(body.urlencoded({extended:false}));
+app.use(express.static(path.join(__dirname, '../paddys/dist')));
 
 let url = 'mongodb://Bryan224:Julie1234@ds163650.mlab.com:63650/paddys'
 let base;
@@ -27,7 +28,6 @@ MongoClient.connect(url, { useNewUrlParser: true }, (err, database) => {
 // get site data
 
 app.get("/", (req,res) => {
-  app.use(express.static(path.join(__dirname, '../paddys/dist')));
   res.sendFile(path.join(__dirname, '../paddys/dist'), 'index.html')
 });
 
