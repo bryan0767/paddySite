@@ -28,7 +28,7 @@ MongoClient.connect(url, { useNewUrlParser: true }, (err, database) => {
 
    app.listen( port, () => {
      // console.log('paddy site with react', path.join(__dirname, '../paddys/dist'))
-     console.log('listening', port)
+     console.log('listening')
    })
 })
 
