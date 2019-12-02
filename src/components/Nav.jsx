@@ -10,12 +10,12 @@ export default class Nav extends React.Component {
       <nav className="mainNav">
        <div className="nav-wrapper">
            <HashLink to ="/#main" smooth>
-             <input className="brand-logo center mainLogo" placeholder="Paddy Macs"  />
+             <div className="brand-logo center mainLogo">Paddy Macs</div>
            </HashLink>
          <ul id="nav-mobile">
            { this.props.data.map(x => {
              return x.position == "left" ? (
-               <input data-key={x.id} key={x.icon} className="hide-on-small-only navInputs" placeholder={x.icon}  />
+               <div data-key={x.id} key={x.icon} className="hide-on-small-only navInputs">{x.icon}</div>
              ) : ( x.hash ? (
                  <a href={x.hash} className="hide-on-small-only icons"><li key={x.icon} className={x.icon}></li></a>
                ) : ( <NavSideNav trig={<li key={x.icon} className={`${x.icon} burger`}></li> } />)

@@ -43,6 +43,7 @@ body.noScroll {
 .MainCarouselButtons {
   color:white;
   background:rgba(53, 76, 43, .7);
+  margin:5px !important;
     &:hover {
       background:hsla(50,50%,55%,.7);
     }
