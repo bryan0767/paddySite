@@ -43,7 +43,6 @@ let hashFunction = function(key) {
   return Math.abs(hash);
 };
 
-
 // get site data
 
 app.get("/", (req,res) => {
