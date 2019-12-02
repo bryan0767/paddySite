@@ -11,6 +11,11 @@ body.noScroll {
   overflow:hidden;
 }
 
+.adminModal {
+  min-width:50vw;
+  max-width:80vw;
+}
+
 .bottomRow {
    position:absolute;
    bottom:80px;
@@ -58,4 +63,12 @@ body.noScroll {
       background:rgba(53, 76, 43, 1) !important;
       color:hsl(50,50%,55%) !important;
     }
+  }
+
+  .lazy {
+    transition: opacity 1s;
+    opacity:0;
+      &.active {
+        opacity:1;
+      }
   }

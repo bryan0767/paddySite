@@ -5,44 +5,22 @@ import {Row, Col, Button} from 'react-materialize'
 export default class Forms extends React.Component {
   constructor(props) {
     super(props);
-    this._isMounted = false
     this.email = {}
     this.reservation = {}
-    this.state = {
-      Forms:[]
-    }
-  }
-
-  componentDidMount() {
-    this._isMounted = true;
-    this.fetchData()
-  }
-
-  componentWillUnmount() {
-   this._isMounted = false;
-  }
-
-  fetchData = () =>  {
-    fetch("api/get?id=5")
-      .then(blob => blob.json())
-      .then(data => {
-        this.setState({
-          Forms:[...data.data]
-        })
-      })
   }
 
   send = (type, index) => {
-    if( Object.keys(this[type]).length == this.state.Forms[index].inputs.length
+    let keys =  Object.keys(this[type]);
+    let values =  Object.values(this[type]);
+    let inputs = this.props.data[index]
+
+    if( Object.keys(this[type]).length == this.props.data[index].inputs.length
         && Object.values(this[type]).every(x => x.length > 0) ) {
-        if( index == 0 && isNaN( parseInt(this[type]['appointment_size']))) {
-            M.toast({html:"Please enter a valid number for your party size",
-                    classes:'rounded red darken-3'})
-          } else {
-            let endpoint = type == 'reservation' ? "api/reserve" : "api/contact"
 
-            M.toast({ html: `Your ${type} has been sent thank you!`, classes:'rounded amber darken-1'})
 
+           let endpoint =  "api/contact"
+
+            console.log(this[type])
             fetch(`${endpoint}`, {
               method:"POST",
               headers: {
@@ -53,31 +31,29 @@ export default class Forms extends React.Component {
                 data:this[type]
               })
             }).then(res => {
-                if(type == 'email') {
-                  $("#6").val("")
-                  $("#email8").val("")
-                  $("#FormTextArea").val("")
-                } else {
-                  $(".datepicker").val("");
-                  $(".timepicker").val("")
-                  $("#4").val("")
-                  $("#5").val("")
-                }
+                $("#email7").val("")
+                $("#FormTextArea").val("")
+                $("#5").val("")
+                M.toast({ html: `Your ${type} has been sent thank you!`, classes:'rounded amber darken-1'})
             })
-          }
+
     } else {
       M.toast({html: "Please fill in all fields", classes: "rounded red darken-3"})
     }
   }
 
   fillInput = (e, data) => {
-    this.state.Forms.map((x,y) => {
+    // console.log(e, data, 'wat the fuck')
+    this.props.data.map((x,y) => {
+      console.log(y, data.group_id, 'first map')
       if(y == data.group_id) {
-        this.state.Forms[y].inputs.map(a => {
+        this.props.data[y].inputs.map(a => {
+          console.log(e.target.dataset.type, a.id, 'the values')
           switch(e.target.dataset.type) {
             case a.id:
               e.target.validity.valid ?
               this[x.type][a.id] = e.target.value : e=e
+              console.log(this[x.type][a.id], 'the value in fll')
             break;
             default:;
           }
@@ -87,8 +63,8 @@ export default class Forms extends React.Component {
   }
 
   renderForms = () => {
-    return this.state.Forms.map((x,z) => {
-      return <Col s={12} m={6}
+    return this.props.data.map((x,z) => {
+      return <Col s={12} m={12}
                   key={x.type}
                   data-key={x.type}
                   className="form_item">
@@ -117,8 +93,8 @@ export default class Forms extends React.Component {
 
   render() {
     return (
-      <Row className="formRow" id="forms">
-        {this._isMounted ? this.renderForms() : (<div>Error Loading</div>)}
+      <Row className="formRow lazy" data-function="fetchForms" data-array="forms" id="forms">
+        {this.props.mounted ? this.renderForms() : (<div>Error Loading</div>)}
       </Row>
     );
   }

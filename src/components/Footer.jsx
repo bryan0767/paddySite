@@ -6,54 +6,35 @@ import FooterMap from './FooterMap'
 class Footer extends React.Component {
   constructor(props) {
     super(props);
-    this._isMounted = false;
-    this.state = {
-      Footer:''
-    }
   }
 
-  componentDidMount() {
-    this._isMounted = true;
-    this.fetchData()
-  }
-
-  componentWillUnmount() {
-   this._isMounted = false;
-  }
-
-  fetchData = () => {
-    fetch("api/get?id=6")
-    .then(blob => blob.json())
-    .then(data => {
-      this.setState({
-        Footer: [...data.data]
-      })
+  renderData = () => {
+    return this.props.data.map((x) => {
+      return <Col s={12} m={12/this.props.data.length} style={{textAlign:"center", margin:"40px 0"}}>
+                <h5 style={{marginBottom:"20px"}}>{x.title}</h5>
+                  {
+                    x.subStuff.map(y => {
+                      return <div className="footerContent" style={{height: y.id == 'google' ? "13em" : "2.5em"}} id={y.id} >
+                                {
+                                typeof y.title == 'object' ? y.title.map(z => {
+                                  return <a href={z.hash} style={{marginRight:"10px", color:"white"}}>
+                                            <li className={z.icon}></li>
+                                         </a>
+                                  }) : y.id == 'google' ? ( <FooterMap /> ) : (y.title)
+                                }
+                            </div>
+                          })
+                        }
+              </Col>
     })
   }
 
   render() {
     return (
-      <Row className="footerRow">
+      <Row className="footerRow lazy" data-function="fetchFooter" data-array="footer">
         {
-          this._isMounted ? (
-            this.state.Footer.map(x => {
-              return <Col s={12} m={12/this.state.Footer.length} style={{textAlign:"center", margin:"40px 0"}}>
-                        <h5 style={{marginBottom:"20px"}}>{x.title}</h5>
-                          {
-                            x.subStuff.map(y => {
-                              return <div className="footerContent" style={{height: y.id == 'google' ? "13em" : "2.5em"}} id={y.id} >
-                                        {
-                                        typeof y.title == 'object' ? y.title.map(z => {
-                                          return <a href={z.hash} style={{marginRight:"10px", color:"white"}}>
-                                                    <li className={z.icon}></li>
-                                                 </a>
-                                          }) : y.id == 'google' ? ( <FooterMap /> ) : (y.title)
-                                        }
-                                    </div>
-                                  })
-                                }
-                      </Col>
-            })
+          this.props.mounted ? (
+            this.renderData()
           ) : (<div>not loaded</div>)
         }
       </Row>

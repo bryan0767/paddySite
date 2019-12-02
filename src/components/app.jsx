@@ -4,7 +4,7 @@ import styles from '../styles.scss'
 
 import Home from './Home'
 import Menu from './Menu'
-import Footer from './Footer.jsx'
+import Footer from './Footer'
 
 export default class App extends React.Component {
   render() {
@@ -17,7 +17,6 @@ export default class App extends React.Component {
             <Route component={Home} />
           </Switch>
         </BrowserRouter>
-        <Footer />
       </div>
     );
   }

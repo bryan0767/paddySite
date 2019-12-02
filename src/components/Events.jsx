@@ -5,35 +5,12 @@ import { HashLink } from 'react-router-hash-link';
 export default class Events extends React.Component {
   constructor(props) {
     super(props);
-    this._isMounted = false;
-    this.state = {
-      Events:''
-    }
-  }
-
-  componentDidMount() {
-    this._isMounted = true;
-    this.fetchData()
-  }
-
-  componentWillUnmount() {
-   this._isMounted = false;
-  }
-
-  fetchData = () => {
-    fetch("api/get?id=4")
-    .then(blob => blob.json())
-    .then(data => {
-      this.setState({
-        Events: [...data.data]
-      })
-    })
   }
 
   renderEvents = () => {
-    return this.state.Events.map((x,y) => {
+    return this.props.data.map((x,y) => {
       return <HashLink to={x.hash}>
-               <Col key={x.image}  s={12} m={12/this.state.Events.length} className="eventsCol">
+               <Col key={x.image}  s={12} m={12/this.props.data.length} className="eventsCol">
                     <img src={x.image} className="eventPics"/>
                     <div className="imageText">{x.title}</div>
                </Col>
@@ -43,8 +20,8 @@ export default class Events extends React.Component {
 
   render() {
     return (
-      <Row>
-        {this._isMounted ? this.renderEvents() : (<div>Not Loaded</div>)}
+      <Row id="events" className="lazy" data-function = 'fetchEvents' data-array="events">
+        {this.props.mounted ? this.renderEvents() : (<div></div>)}
       </Row>
     );
   }

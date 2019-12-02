@@ -20,6 +20,14 @@
     flex-flow: column;
 }
 
+// #dailySpecialsHeader {
+//   transition: opacity 1s;
+//   opacity:0;
+//     &.active {
+//       opacity:1;
+//     }
+// }
+
 @media (max-width:600px) {
   .specialsCarousel {
     width:100%

@@ -42,7 +42,7 @@
 
 .form_item {
   text-align:center;
-  height:90%;
+  height:100%;
   position:relative;
 }
 
@@ -79,10 +79,11 @@
 
 @media (max-width:600px) {
   .form_item {
-    height:50%;
+    height:100%;
+    width:100%;
   }
 
   .formRow {
-    height:100vh
+    height:50vh
   }
 }
