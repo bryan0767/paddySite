@@ -5,8 +5,8 @@
   "main": "./src/index.js",
   "proxy": "https://localhost:3000",
   "scripts": {
-    "start": "webpack --mode development --watch",
-    "dev": "webpack && webpack-dev-server --mode development --hot --watch && nodemon server.js",
+    "start": "webpack --mode production && nodemon server.js",
+    "dev": "webpack && webpack-dev-server --mode development --hot --watch",
     "server": "nodemon server.js",
     "build": "npm install && webpack --mode production"
   },

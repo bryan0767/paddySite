@@ -10,7 +10,7 @@ let app = express()
 
 app.use(body.json())
 app.use(body.urlencoded({extended:false}));
-// app.use(express.static(path.join(__dirname, '../paddys/dist')));
+app.use(express.static(path.join(__dirname, './dist')));
 
 let url = db;
 let base;
@@ -47,8 +47,11 @@ let hashFunction = function(key) {
 // get site data
 
 app.get("/", (req,res) => {
-  res.send('here in the send')
-  // res.sendFile(path.join(__dirname, '../paddys/dist'), 'index.html')
+  res.sendFile(path.join(__dirname, './'), 'index.html')
+});
+
+app.get("/menu", (req,res) => {
+  res.sendFile(path.join(__dirname, './'), 'index.html')
 });
 
 app.get("/api/get", (req, res) => {
