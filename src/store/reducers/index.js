@@ -6,9 +6,9 @@ const initialState = {
 
 function rootReducer(state = initialState, action) {
   if(action.type == 'switch_page') {
-    return Object.assign({}, state, {
+    return {
       page:action.payload
-    })
+    }
   }
   return state
 };

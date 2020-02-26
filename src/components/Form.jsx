@@ -10,18 +10,15 @@ export default class Forms extends React.Component {
   }
 
   send = (type, index) => {
+
     let keys =  Object.keys(this[type]);
     let values =  Object.values(this[type]);
     let inputs = this.props.data[index]
 
-    if( Object.keys(this[type]).length == this.props.data[index].inputs.length
-        && Object.values(this[type]).every(x => x.length > 0) ) {
+    if( keys.length == inputs.inputs.length
+        && values.every(x => x.length > 0) ) {
 
-
-           let endpoint =  "api/contact"
-
-            console.log(this[type])
-            fetch(`${endpoint}`, {
+            fetch("api/contact", {
               method:"POST",
               headers: {
                 'Accept': 'application/json',
@@ -34,26 +31,28 @@ export default class Forms extends React.Component {
                 $("#email7").val("")
                 $("#FormTextArea").val("")
                 $("#5").val("")
-                M.toast({ html: `Your ${type} has been sent thank you!`, classes:'rounded amber darken-1'})
+                M.toast({
+                          html: `Your ${type} has been sent thank you!`,
+                          classes:'rounded amber darken-1'
+                        })
             })
 
     } else {
-      M.toast({html: "Please fill in all fields", classes: "rounded red darken-3"})
+      M.toast({
+                html: "Please fill in all fields",
+                classes: "rounded red darken-3"
+              })
     }
   }
 
   fillInput = (e, data) => {
-    // console.log(e, data, 'wat the fuck')
     this.props.data.map((x,y) => {
-      console.log(y, data.group_id, 'first map')
       if(y == data.group_id) {
         this.props.data[y].inputs.map(a => {
-          console.log(e.target.dataset.type, a.id, 'the values')
           switch(e.target.dataset.type) {
             case a.id:
               e.target.validity.valid ?
               this[x.type][a.id] = e.target.value : e=e
-              console.log(this[x.type][a.id], 'the value in fll')
             break;
             default:;
           }
@@ -68,7 +67,7 @@ export default class Forms extends React.Component {
                   key={x.type}
                   data-key={x.type}
                   className="form_item">
-                <span style={{top:"35px", position:'relative', textAlign:"center", color:"#9c9f83"}}>{x.title}</span>
+                <span style={{top:"25px", position:'relative', textAlign:"center", color:"#9c9f83"}}>{x.title}</span>
                 <div className="form_inputs">
                     {
                       x.inputs.map(y => {
