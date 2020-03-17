@@ -8,15 +8,21 @@ var csv      = require('csv-express');
 let { port, db, service, email, pass } = require('./config');
 let app = express()
 
+// for digital ocean
+const aws = require('aws-sdk');
+const multer = require('multer');
+const multerS3 = require('multer-s3');
+
 app.use(body.json())
 app.use(body.urlencoded({extended:false}));
 app.use(express.static(path.join(__dirname, './dist')));
 
 let url = db;
-let base;
+let base; 
 let reserves;
 let signups;
 let users;
+let images;
 
 MongoClient.connect(url, { useNewUrlParser: true }, (err, database) => {
   if(err) return console.error(err)
@@ -25,10 +31,11 @@ MongoClient.connect(url, { useNewUrlParser: true }, (err, database) => {
    reserves = database.db('paddys').collection('reservations');
    signups = database.db('paddys').collection('signups');
    users = database.db('paddys').collection('users');
+   images = database.db('paddys').collection('images');
 
    app.listen( port, () => {
      // console.log('paddy site with react', path.join(__dirname, '../paddys/dist'))
-     console.log('listening')
+     console.log('listening', port)
    })
 })
 
@@ -43,14 +50,31 @@ let hashFunction = function(key) {
   return Math.abs(hash);
 };
 
+const spacesEndpoint = new aws.Endpoint('nyc3.digitaloceanspaces.com');
+  const s3 = new aws.S3({
+    endpoint: spacesEndpoint
+  });
+
+  const upload = multer({
+    storage: multerS3({
+      s3: s3,
+      bucket: 'imagemodeling',
+      acl: 'public-read',
+      key: function (request, file, cb) {
+        console.log(file);
+        cb(null, file.originalname);
+      }
+    })
+  }).array('upload', 1);
+
 // get site data
 
 app.get("/", (req,res) => {
-  res.sendFile(path.join(__dirname, './'), 'index.html')
+  // res.sendFile(path.join(__dirname, '/'), 'index.html')
 });
 
 app.get("/menu", (req,res) => {
-  res.sendFile(path.join(__dirname, './'), 'index.html')
+  // res.sendFile(path.join(__dirname, '/'), 'index.html')
 });
 
 app.get("/api/get", (req, res) => {
@@ -111,6 +135,14 @@ app.get("/api/exportMembers", (req, res) => {
       res.csv(mapped, true);
   })
 })
+
+app.get("/api/getImages", (req, res) => {
+  images.find({}).toArray( (err, data) => {
+    if(err) console.log(err)
+    res.json(data)
+  } )
+})
+
 
 // put data
 
@@ -281,6 +313,23 @@ app.post('/api/signup', (req, res) => {
       }
     })
 });
+
+app.post("api/uploadImage", (req, res) => {
+  let file = req.body.file
+  file = {
+    name:file.name,
+    hash: hashFunction(file.name) + file.type,
+    type:file.type, 
+    size:file.size
+  }
+  upload(req, res, (error) => {
+    if (error) console.log(error);
+    console.log("file uploaded successfully");
+  });
+
+  images.insertOne(file);
+  res.json("file uploaded successfully");
+})
 
 // delete
 

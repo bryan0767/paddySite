@@ -3,13 +3,13 @@ import Confirm from './Confirm'
 import { Modal, TextInput, Button, Collection, CollectionItem, Breadcrumb, Switch } from 'react-materialize'
 
 export default class Admin extends React.Component {
-
     constructor(props) {
       super(props);
       this.defaultDisplay = [
         { name:"Edit Menu", action:"edit" },
         { name:"Settings", action:"settings"},
         { name:"News Letter Members", action:"members"},
+        { name:"Images", action:"images"}
       ]
       this.defaultActions = [
         <Button modal="close"  style={{"marginRight": "20px"}}>Close</Button>
@@ -17,6 +17,7 @@ export default class Admin extends React.Component {
       this.state = {
         menu:[],
         crumbs:[],
+        images:[],
         request: {},
         newEntry: {},
         currentItem:{},
@@ -47,7 +48,22 @@ export default class Admin extends React.Component {
           })
     }
 
+    fetchImages = async() => {
+      fetch("/api/getImages")
+           .then(blob => blob.json())
+           .then(x => {
+            this.setState({
+              currentItem:{},
+              display:[],
+              section:"images",
+              crumbs:[{name:"Images", action:"nothing"}],
+              images:[...x]
+            })
+           })
+    }
+
     populateMenu = (data, action="admin") => {
+      console.log(data, action, 'in the populate menu section')
       switch(action) {
         case "edit":
           this.fetchData(data);
@@ -75,6 +91,9 @@ export default class Admin extends React.Component {
         break;
         case "nothing":
         break;
+        case "images":
+          this.fetchImages()
+        break;
         default:
           this.setState({
             crumbs: [],
@@ -91,30 +110,6 @@ export default class Admin extends React.Component {
 
     fetchData = (root) => {
       let new_actions = [<Button modal="close"  style={{"marginRight": "20px"}}>Close</Button>]
-
-      // new_actions.unshift(
-      //   <Modal header="New Menu Section"
-      //     actions={
-      //       [
-      //         <Confirm
-      //                  header="Confirm"
-      //                  buttonText="Save"
-      //                  text="Are you sure you wish to add this section?"
-      //                  modalStyles={{ "display":"inline", "marginLeft":"10px"}}
-      //                  actions={
-      //                           [<Button modal="close" onClick={() => this.addNewItem({ action:"main", data_schema:['name'], data:[] })} style={{"marginRight":"10px"}}>Yes, Create</Button>,
-      //                            <Button modal="close">Cancel</Button>]
-      //                            }>Save</Confirm>,
-      //       <Button modal="close" style={{"margin": "0 20px"}}>Close</Button>
-      //       ]
-      //     }
-      //     trigger={
-      //       <Button style={{ "marginRight":"20px" }}>Add New</Button>
-      //           }>
-      //         <label htmlFor="mainName" style={{"fontSize":"15px"}}>name</label>
-      //         <TextInput id="mainName" value={this.state.newEntry.name} onChange={() => this.changeItem(event, 'name', 'newEntry')}/>
-      //   </Modal>
-      // )
 
       fetch("api/get?id=7")
       .then(blob => blob.json())
@@ -231,7 +226,6 @@ export default class Admin extends React.Component {
                 section:'main'
               })
             } else {
-              console.log('here in the function')
               if(this.state.section != "main") {
                 this.setState({
                   display: data.data,
@@ -264,12 +258,10 @@ export default class Admin extends React.Component {
       <Button modal="close"  style={{"marginRight": "20px"}}>Close</Button>
     ]
 
-
     if(!x) {
       fetch("/api/getMembers")
           .then(blob => blob.json())
           .then(res => {
-            console.log(res, 'the response in the function')
             let data = res.map(x =>{
                x['name'] = x['email']
                x['action'] = "nothing"
@@ -314,7 +306,6 @@ export default class Admin extends React.Component {
 
       request['id'] = '7';
       request['data'] = newEntry
-      console.log(newEntry, 'the newEntry', data.data, 'the data')
       fetch(`/api/${url}`, {
         method:"POST",
         headers: {
@@ -329,6 +320,7 @@ export default class Admin extends React.Component {
     }
 
     validateEmail = (e, key) => {
+      console.log('validating things')
       if(key != "submit") {
         this.setState({
           [key]: e.target.value
@@ -350,12 +342,36 @@ export default class Admin extends React.Component {
       }
 
       renderItemInputs = (type=false) => {
+
+        // image section will go here
+
         if(this.state.section == "settings" ) {
           return <div style={{"margin":"20px 0"}}>
                   <label htmlFor="priceSwitch" style={{"fontSize": "12px"}}>Show Menu Prices</label>
                   <Switch checked={this.state.prices == true} offLabel="Hide" onLabel="Show" id="priceSwitch" onChange={() => this.changePriceView({}, "none")}/>
                   <Button onClick={() => this.changePriceView({}, "request")} style={{"margin": "20px 0"}}>Save</Button>
                 </div>
+        } else if (this.state.section == "images"){
+            return <div>
+                      <div>
+                          {/* add button to map images  */}
+                          <form method="post" enctype="multipart/form-data" action="/api/uploadImage">
+                            <label for="file">Upload new Image</label>
+                            <input type="file" />
+                            <input type="submit"> Upload </input>
+                          </form>
+                      </div>
+                      <div style={{ "display":"flex", "flexFlow":"row wrap", "border":"1px solid pink", "width":"100%"  }}>
+                        {
+                          this.state.images.length > 0 ? this.state.images.map(x => {
+                                                                          return <div style={{ "maxWidth":"33.3%" }}>
+                                                                                   <img src={ `https://imagemodeling.nyc3.digitaloceanspaces.com/${x.hash}`} style={{ "width":"90%", "height":"90%" }} />
+                                                                                 </div>
+                                                                        }) : 
+                                                                        <div>No images to display</div>
+                        }
+                     </div>
+                   </div>
         } else {
         // else if(this.state.section == "item") {
           return <div> {
@@ -498,7 +514,6 @@ export default class Admin extends React.Component {
       }
 
       changeSection = (data, action) => {
-        console.log(data, action ,'the data then the action')
         let new_actions = [<Button modal="close" style={{"margin": "0 20px"}}>Close</Button>];
         this.setState({
           currentItem: data,
@@ -521,7 +536,7 @@ export default class Admin extends React.Component {
                 }}>
                 {
                   !this.state.validated ?
-                    <div>
+                    <div style={{ "maxWidth":"600px" }}>
                           <div className="brand-logo center mainLogo" style={{ "color":"#26a69a", "margin": "0 auto" }}>Paddy Macs Admin</div>
                           <TextInput value={this.state.email} onChange={() => this.validateEmail(event, 'username')} placeholder="Username" style={{ "marginBottom":"20px !important" }}></TextInput>
                           <TextInput placeholder="Password" password onChange={() => this.validateEmail(event, 'password')}></TextInput>
@@ -549,7 +564,7 @@ export default class Admin extends React.Component {
                                               "outline":"none",
                                               "flex":"4" }}
                                             onClick={() => this.populateMenu(x, x.action)}>
-                                                {x.name}
+                                            {x.name}
                                          </CollectionItem>
                                          {
                                            this.state.showEdit ?
