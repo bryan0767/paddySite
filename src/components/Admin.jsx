@@ -48,22 +48,22 @@ export default class Admin extends React.Component {
           })
     }
 
-    fetchImages = async() => {
+    fetchImages = () => {
       fetch("/api/getImages")
            .then(blob => blob.json())
            .then(x => {
+             console.log(x, "the x value in the thing")
             this.setState({
               currentItem:{},
               display:[],
               section:"images",
               crumbs:[{name:"Images", action:"nothing"}],
-              images:[...x]
+              images:[...x[0]['data']]
             })
            })
     }
 
     populateMenu = (data, action="admin") => {
-      console.log(data, action, 'in the populate menu section')
       switch(action) {
         case "edit":
           this.fetchData(data);
@@ -120,8 +120,6 @@ export default class Admin extends React.Component {
           section:"main",
           showEdit:true
         }, () => {
-
-          //
           new_actions.unshift(
             <Modal header="New Menu Section"
               actions={
@@ -151,7 +149,6 @@ export default class Admin extends React.Component {
                     }
             </Modal>
           )
-          //
             this.setState(state => ({
               display:state.menu,
               actions:new_actions
@@ -174,9 +171,7 @@ export default class Admin extends React.Component {
 
         new_actions.unshift(
           <Modal header="New Item"
-                 trigger={
-                   <Button style={{ "marginRight":"20px" }}>Add New</Button>
-                        }
+                 trigger={<Button style={{ "marginRight":"20px" }}>Add New</Button>}
                   actions={[
                     <Confirm
                              header="Confirm"
@@ -320,7 +315,6 @@ export default class Admin extends React.Component {
     }
 
     validateEmail = (e, key) => {
-      console.log('validating things')
       if(key != "submit") {
         this.setState({
           [key]: e.target.value
@@ -333,12 +327,21 @@ export default class Admin extends React.Component {
                 this.setState({
                   validated:true,
                   actions:this.defaultActions
+                }, () => {
+                  // var d = new Date();
+                  // d.setTime(d.getTime() + (1*24*60*60*1000));
+                  // let expires = "expires="+ d.toUTCString();
+                  // document.cookie = "admin=true;" + expires + ";path=/";
                 })
               } else {
                 M.toast({html: "Incorrect username or password entered", classes: "rounded red darken-3"})
               }
             })
         }
+      }
+
+      submitForm = (form) => {
+        console.log(form, 'in the submit function')
       }
 
       renderItemInputs = (type=false) => {
@@ -354,20 +357,19 @@ export default class Admin extends React.Component {
         } else if (this.state.section == "images"){
             return <div>
                       <div>
-                          {/* add button to map images  */}
-                          <form method="post" enctype="multipart/form-data" action="/api/uploadImage">
-                            <label for="file">Upload new Image</label>
-                            <input type="file" />
-                            <input type="submit"> Upload </input>
+                          <form method="post" enctype="multipart/form-data" action="/api/uploadImage" onSubmit={(e, data) => this.submitForm(e, data)} style={{ "padding":"20px 0" }}>
+                            <label htmlFor="file">Upload new Image</label>
+                            <input type="file" name="upload" style={{ margin:"20px 0" }}/>
+                            <input type="submit" onClick={(e, form) => this.submitForm(e, form)}/>
                           </form>
                       </div>
-                      <div style={{ "display":"flex", "flexFlow":"row wrap", "border":"1px solid pink", "width":"100%"  }}>
+                      <div style={{ "display":"flex", "flexFlow":"row wrap", "width":"100%"  }}>
                         {
                           this.state.images.length > 0 ? this.state.images.map(x => {
                                                                           return <div style={{ "maxWidth":"33.3%" }}>
-                                                                                   <img src={ `https://imagemodeling.nyc3.digitaloceanspaces.com/${x.hash}`} style={{ "width":"90%", "height":"90%" }} />
+                                                                                   <img src={ `${x.image}`} style={{ "width":"90%", "height":"90%" }} />
                                                                                  </div>
-                                                                        }) : 
+                                                                        }) :
                                                                         <div>No images to display</div>
                         }
                      </div>
@@ -536,7 +538,7 @@ export default class Admin extends React.Component {
                 }}>
                 {
                   !this.state.validated ?
-                    <div style={{ "maxWidth":"600px" }}>
+                    <div>
                           <div className="brand-logo center mainLogo" style={{ "color":"#26a69a", "margin": "0 auto" }}>Paddy Macs Admin</div>
                           <TextInput value={this.state.email} onChange={() => this.validateEmail(event, 'username')} placeholder="Username" style={{ "marginBottom":"20px !important" }}></TextInput>
                           <TextInput placeholder="Password" password onChange={() => this.validateEmail(event, 'password')}></TextInput>

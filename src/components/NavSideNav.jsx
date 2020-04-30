@@ -21,7 +21,7 @@ export default (props) => {
               <SideNavItem waves><HashLink to="/#specials" smooth onClick={closeEmUp}>Specials</HashLink></SideNavItem>
               <SideNavItem divider />
               <SideNavItem href="menu"><HashLink to="/menu" onClick={closeEmUp}>Menu</HashLink></SideNavItem>
-              <SideNavItem waves><HashLink to="/#forms" smooth onClick={closeEmUp}>Reserve</HashLink></SideNavItem>
+              <SideNavItem waves><HashLink to="/#forms" smooth onClick={closeEmUp}>Message</HashLink></SideNavItem>
             </SideNav>
           </div>
         }

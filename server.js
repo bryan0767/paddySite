@@ -18,7 +18,7 @@ app.use(body.urlencoded({extended:false}));
 app.use(express.static(path.join(__dirname, './dist')));
 
 let url = db;
-let base; 
+let base;
 let reserves;
 let signups;
 let users;
@@ -51,17 +51,19 @@ let hashFunction = function(key) {
 };
 
 const spacesEndpoint = new aws.Endpoint('nyc3.digitaloceanspaces.com');
-  const s3 = new aws.S3({
-    endpoint: spacesEndpoint
-  });
 
-  const upload = multer({
-    storage: multerS3({
-      s3: s3,
-      bucket: 'imagemodeling',
-      acl: 'public-read',
-      key: function (request, file, cb) {
-        console.log(file);
+const s3 = new aws.S3({
+  endpoint: spacesEndpoint,
+  signatureVersion: 'v4'
+});
+
+const upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: 'imagemodeling',
+    acl: 'public-read',
+    key: (request, file, cb) => {
+        console.log(file, 'in the upload function of the thing');
         cb(null, file.originalname);
       }
     })
@@ -139,7 +141,7 @@ app.get("/api/exportMembers", (req, res) => {
 app.get("/api/getImages", (req, res) => {
   images.find({}).toArray( (err, data) => {
     if(err) console.log(err)
-    res.json(data)
+    res.json(data[0])
   } )
 })
 
@@ -168,6 +170,7 @@ app.post("/api/newSection", (req, res) => {
   })
   res.json("Section Inserted");
 })
+
 app.post("/api/newSubSection", (req, res) => {
   base.updateOne(
     { _id: req.body.id},
@@ -314,21 +317,23 @@ app.post('/api/signup', (req, res) => {
     })
 });
 
-app.post("api/uploadImage", (req, res) => {
-  let file = req.body.file
-  file = {
-    name:file.name,
-    hash: hashFunction(file.name) + file.type,
-    type:file.type, 
-    size:file.size
-  }
+app.post("/api/uploadImage", (req, res) => {
+  // let file = req
+  // console.log(res, 'the response in the function')
+  // console.log(req)
+  // file = {
+  //   name:file.name,
+  //   hash: hashFunction(file.name) + file.type,
+  //   type:file.type,
+  //   size:file.size
+  // }
   upload(req, res, (error) => {
-    if (error) console.log(error);
+    if (error) console.log(error, 'the error');
     console.log("file uploaded successfully");
   });
 
-  images.insertOne(file);
-  res.json("file uploaded successfully");
+  // images.insertOne(file);
+  // res.json("file uploaded successfully");
 })
 
 // delete

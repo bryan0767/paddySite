@@ -67,7 +67,7 @@ export default class Forms extends React.Component {
                   key={x.type}
                   data-key={x.type}
                   className="form_item">
-                <span style={{top:"25px", position:'relative', textAlign:"center", color:"#9c9f83"}}>{x.title}</span>
+                <span style={{textAlign:"center", color:"#9c9f83"}}>{x.title}</span>
                 <div className="form_inputs">
                     {
                       x.inputs.map(y => {
@@ -85,7 +85,7 @@ export default class Forms extends React.Component {
                         })
                       }
                   </div>
-                  <Button className={`button_${x.id} centerHorizantal formSubmit`} onClick={ () => this.send(x.type, z)}>Send</Button>
+                  <Button className={`button_${x.id} formSubmit`} onClick={ () => this.send(x.type, z)}>Send</Button>
                 </Col>
     })
   }
