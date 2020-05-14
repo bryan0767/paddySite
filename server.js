@@ -63,7 +63,6 @@ const upload = multer({
     bucket: 'imagemodeling',
     acl: 'public-read',
     key: (request, file, cb) => {
-        console.log(file, 'in the upload function of the thing');
         cb(null, file.originalname);
       }
     })
@@ -89,7 +88,16 @@ app.get("/api/get", (req, res) => {
 app.get("/api/get_all", (req, res) => {
      base.find({}).toArray((err, data) => {
        if (err) console.error(err)
-       res.json(data);
+       images.find({}).toArray( (err, y) => {
+         if(err) console.error(err)
+          data.map(a => {
+            return a.images.map(b => {
+              b['src'] = y.filter(z => z['image_id'] == b['_id'])[0]['src']
+              return b
+            })
+          })
+          res.json(data)
+       })
      })
 })
 
@@ -123,7 +131,6 @@ app.get("/api/getMembers", (req, res) => {
 app.get("/api/exportMembers", (req, res) => {
   signups.find({}).toArray( (err, data) => {
     if(err) console.log(err)
-
     let mapped = data.map(x => {
       return {
         email: x.email,
@@ -141,7 +148,7 @@ app.get("/api/exportMembers", (req, res) => {
 app.get("/api/getImages", (req, res) => {
   images.find({}).toArray( (err, data) => {
     if(err) console.log(err)
-    res.json(data[0])
+    res.json(data)
   } )
 })
 
@@ -159,6 +166,41 @@ app.put("/api/update", (req, res) => {
 })
 
 // post data
+
+app.post("/api/updateImage", (req, res) => {
+  console.log(req.body, 'the body')
+  images.findOneAndUpdate(
+    {
+      image_id: req.body.old_data['_id']
+    },
+    {
+      $set: {
+        src: req.body.new_data['src']
+      }
+    }
+  )
+  images.find({}).toArray((err, data) => {
+    if(err) console.log(err)
+    let max = 0;
+    let dupl = false;
+    for(let x = 0;x< data.length;x++) {
+      if(parseInt(data[x]['_id']) > max) {
+        max = parseInt(data[x]['_id'])
+      }
+
+      if(data[x]['src'] == req.body.old_data['src']) {
+        dupl = true
+      }
+    }
+
+    if(!dupl) {
+      images.insertOne({ src: req.body.old_data['src'],
+                         image_id:"",
+                         _id:(max + 1).toString() })
+    }
+  })
+  res.json("Image Updated!");
+})
 
 app.post("/api/newSection", (req, res) => {
   base.updateOne(
@@ -320,17 +362,19 @@ app.post('/api/signup', (req, res) => {
 app.post("/api/uploadImage", (req, res) => {
   // let file = req
   // console.log(res, 'the response in the function')
-  // console.log(req)
+  console.log(req.body)
   // file = {
   //   name:file.name,
   //   hash: hashFunction(file.name) + file.type,
   //   type:file.type,
   //   size:file.size
   // }
-  upload(req, res, (error) => {
-    if (error) console.log(error, 'the error');
-    console.log("file uploaded successfully");
-  });
+
+
+  // upload(req, res, (error) => {
+  //   if (error) console.log(error, 'the error');
+  //   console.log("file uploaded successfully");
+  // });
 
   // images.insertOne(file);
   // res.json("file uploaded successfully");

@@ -52,7 +52,6 @@ export default class Home extends React.Component {
       if(e.code.toLowerCase() == 'escape') {
         secret = "";
       } else if(secret == 'admin') {
-        console.log(e.target.value, 'here in the listener?')
         this.admin();
         secret = "";
       }
@@ -75,19 +74,46 @@ export default class Home extends React.Component {
     fetch("/api/get_all")
         .then(blob => blob.json())
         .then(res => {
+
+          this.setState({
+            all: res
+          })
+
           let arrs = Object.keys(this.state).filter(x => Array.isArray( this.state[x] ))
+
           for(let x = 0;x<arrs.length;x++) {
-            let data = res.filter(y => y['type'] == arrs[x])[0].data;
+
+            let filtered = res.filter(y => y['type'] == arrs[x])
+            let data = filtered[0].data;
+
+            const mapImages = (inputData) => {
+              inputData.map(a => {
+                for(let z = 0;z < filtered[0].images.length;z++) {
+                  if(a['image_id'] == filtered[0].images[z]['_id']) {
+                      a['image'] = filtered[0].images[z]['src']
+                  }
+                }
+                return a
+              })
+              return inputData
+            }
+
             switch( arrs[x] ) {
               case "main" :
+
+              let mainData = data.filter(x => x.page == 1)
+
               this.setState({
-                [arrs[x]]: data.filter(x => x.page == 1)
+                [arrs[x]]: mapImages(mainData)
               })
+
               break;
               case "specials":
+
               this.setState({
-                [arrs[x]]: data.slides
+                [arrs[x]]: mapImages(data.slides)
               })
+
               break;
               case "nav" :
               this.setState({
@@ -106,7 +132,7 @@ export default class Home extends React.Component {
               break;
               default:
               this.setState({
-                [arrs[x]]: data
+                [arrs[x]]: mapImages(data)
               })
               break;
             }
@@ -125,7 +151,7 @@ export default class Home extends React.Component {
           <Events data={this.state.events} mounted={this.state._eventsMounted}/>
           <Form data={this.state.forms} mounted={this.state._formsMounted}/>
           <Footer data={this.state.footer} mounted={this.state._footerMounted} />
-          <Admin mounted={this.state.showAdmin} close={this.closeModal}/>
+          <Admin mounted={this.state.showAdmin} close={this.closeModal} data={this.state.all} store={this.props.store} />
         </div>) : (<div className="react_preloader"><img style={{ "height":"15vh" }}src="https://thumbs.gfycat.com/DimForthrightCanvasback-max-1mb.gif"/></div>)
       }
     </div>

@@ -1,6 +1,6 @@
 import React from 'react'
 import Confirm from './Confirm'
-import { Modal, TextInput, Button, Collection, CollectionItem, Breadcrumb, Switch } from 'react-materialize'
+import { Modal, TextInput, Button, Collection, CollectionItem, Breadcrumb, Switch, Tabs, Tab } from 'react-materialize'
 
 export default class Admin extends React.Component {
     constructor(props) {
@@ -23,17 +23,22 @@ export default class Admin extends React.Component {
         currentItem:{},
         username:"",
         password:"",
-        section:"main",
+        section:"images",
+        // section:"main",
         prices:true,
-        validated:false,
+        // validated:false,
+        validated:true,
         showEdit:false,
         display:this.defaultDisplay,
         actions:[
           <Button type="submit" onClick={ () => this.validateEmail(event, 'submit') } style={{"marginRight":"10px"}}>Login</Button>,
           <Button modal="close"  style={{"marginRight": "20px"}}>Close</Button>
         ],
+        replacedImage:{},
+        selectedImage:{}
       }
     }
+
     fetchPrices = () => {
       fetch("/api/get?id=7")
           .then(blob=>blob.json())
@@ -52,13 +57,12 @@ export default class Admin extends React.Component {
       fetch("/api/getImages")
            .then(blob => blob.json())
            .then(x => {
-             console.log(x, "the x value in the thing")
             this.setState({
               currentItem:{},
               display:[],
               section:"images",
               crumbs:[{name:"Images", action:"nothing"}],
-              images:[...x[0]['data']]
+              images:[...x]
             })
            })
     }
@@ -345,8 +349,8 @@ export default class Admin extends React.Component {
       }
 
       renderItemInputs = (type=false) => {
-
-        // image section will go here
+        // let replacedImage;
+        // let selectedImage;
 
         if(this.state.section == "settings" ) {
           return <div style={{"margin":"20px 0"}}>
@@ -354,26 +358,106 @@ export default class Admin extends React.Component {
                   <Switch checked={this.state.prices == true} offLabel="Hide" onLabel="Show" id="priceSwitch" onChange={() => this.changePriceView({}, "none")}/>
                   <Button onClick={() => this.changePriceView({}, "request")} style={{"margin": "20px 0"}}>Save</Button>
                 </div>
-        } else if (this.state.section == "images"){
-            return <div>
-                      <div>
-                          <form method="post" enctype="multipart/form-data" action="/api/uploadImage" onSubmit={(e, data) => this.submitForm(e, data)} style={{ "padding":"20px 0" }}>
-                            <label htmlFor="file">Upload new Image</label>
-                            <input type="file" name="upload" style={{ margin:"20px 0" }}/>
-                            <input type="submit" onClick={(e, form) => this.submitForm(e, form)}/>
-                          </form>
-                      </div>
-                      <div style={{ "display":"flex", "flexFlow":"row wrap", "width":"100%"  }}>
-                        {
-                          this.state.images.length > 0 ? this.state.images.map(x => {
-                                                                          return <div style={{ "maxWidth":"33.3%" }}>
-                                                                                   <img src={ `${x.image}`} style={{ "width":"90%", "height":"90%" }} />
-                                                                                 </div>
-                                                                        }) :
-                                                                        <div>No images to display</div>
-                        }
-                     </div>
-                   </div>
+        } else if (this.state.section == "images") {
+          return <Tabs className="tab-demo z-depth-1">
+                    <Tab title="upload new">
+                      <div>these nuts</div>
+                    </Tab>
+                      {
+                        this.props.data.reverse().filter(x => x.images.length > 0).map(x => {
+                          return <Tab
+                                  options={{
+                                    duration: 300,
+                                    onShow: null,
+                                    responsiveThreshold: Infinity,
+                                    swipeable: false
+                                  }}
+                                  title={x.type}>
+                                  <div style={{ "justifyContent":"space-between", "display":"flex", "flexFlow":"row wrap" }}>
+                                      {
+                                        x.images.map(y => {
+                                          return <div className=" col s4 " style={{ marginTop:"20px", display:"flex", flexDirection:"column",
+                                                                                    padding:"0", maxWidth:"32%", justifyContent:"center" }}>
+                                                    <img src={y.src} style={{ width:"100%", height:"auto" }}/>
+
+                                                    <Modal  header="Choose new Image"
+                                                            options={{onOpenStart: () => {
+                                                              this.setState({
+                                                                replacedImage:y
+                                                              })
+                                                            }}}
+                                                            actions={
+                                                              [
+                                                                <Confirm header="Confirm"
+                                                                         buttonText="Save"
+                                                                         text="Are you sure you wish to replace this image?"
+                                                                         modalStyles={{ "display":"inline", "marginLeft":"10px"}}
+                                                                         actions={
+                                                                                  [<Button modal="close" onClick={() => {
+
+                                                                                    // post request
+                                                                                    console.log(this.state.replacedImage, this.state.selectedImage, 'the replaced image')
+                                                                                    fetch("api/updateImage", {
+                                                                                      method:"POST",
+                                                                                      headers: {
+                                                                                        'Accept': 'application/json',
+                                                                                        'Content-Type': 'application/json'
+                                                                                      },
+                                                                                      body: JSON.stringify({
+                                                                                        old_data:this.state.replacedImage,
+                                                                                        new_data:this.state.selectedImage
+                                                                                      })
+                                                                                    }).then(res => {
+                                                                                      M.toast({html: "Image Updated!", classes: "rounded teal"})
+                                                                                      this.populateMenu({}, "default");
+                                                                                    })
+
+                                                                                  }} style={{"marginRight":"10px"}}>Yes, Replace</Button>,
+                                                                                   <Button modal="close">Cancel</Button>]
+                                                                                   }>Save</Confirm>,
+                                                              <Button modal="close" style={{"margin": "0 20px"}} onClick={ () => {
+                                                                this.setState({
+                                                                  selectedImage:{}
+                                                                })
+                                                                let images = document.querySelectorAll(".select_image")
+                                                                images.forEach(x => x.style.border = "none")
+                                                              } }>Close</Button>
+                                                              ]
+                                                            }
+                                                            trigger={<Button style={{ "margin":"10px 0" }}>Replace</Button>}>
+                                                              <div style={{ "justifyContent":"space-between", "display":"flex", "flexFlow":"row wrap" }}>
+                                                                {
+                                                                  this.state.images.map((x, y) => {
+                                                                    return <div className=" col s4 " style={{ marginTop:"20px", display:"flex", flexDirection:"column",
+                                                                                                              padding:"0", maxWidth:"32%", justifyContent:"center" }}>
+                                                                                <img className="select_image" src={x.src} style={{ height:"auto", width:"100%" }} onClick={(e) => {
+                                                                                              e.target.style.border = e.target.style.border == "5px solid #1f5121" ? "none" : "5px solid #1f5121"
+                                                                                              this.setState({
+                                                                                                selectedImage: x
+                                                                                              })
+                                                                                              let images = document.querySelectorAll(".select_image")
+                                                                                              images.forEach(x => {
+                                                                                                if(x != e.target) {
+                                                                                                  x.style.border = "none"
+                                                                                                }
+                                                                                              })
+                                                                                          }}/>
+                                                                    </div>
+                                                                  })
+                                                                }
+                                                                </div>
+                                                    </Modal>
+                                                    // working
+                                                    <Button>Upload New</Button>
+
+                                                 </div>
+                                        })
+                                      }
+                                  </div>
+                                </Tab>
+                        })
+                      }
+                    </Tabs>
         } else {
         // else if(this.state.section == "item") {
           return <div> {
@@ -445,7 +529,6 @@ export default class Admin extends React.Component {
       changeItem = (e, x, obj) => {
         let value = this.state[obj];
         value[ `${x}` ] = e.target.value
-        console.log(value, x, obj)
         this.setState({
           [obj]: value
         })
@@ -530,10 +613,12 @@ export default class Admin extends React.Component {
           {
             this.props.mounted ?
             (
-              <Modal id="adminModal" open={this.props.mounted}
+              <Modal
+                id="adminModal" open={this.props.mounted}
                 className="adminModal"
                 actions={this.state.actions}
                 options={{
+                  onOpenStart: () => this.fetchImages(),
                   onCloseEnd:this.props.close
                 }}>
                 {
@@ -569,18 +654,14 @@ export default class Admin extends React.Component {
                                             {x.name}
                                          </CollectionItem>
                                          {
-                                           this.state.showEdit ?
-
-                                               <i onClick={() => this.changeSection(x, x['action'])}
-                                                 className="material-icons"
-                                                 style={{
-                                                   "float":"right",
-                                                   "padding":"8.5px 3px",
-                                                   "borderBottom":"1px solid #e0e0e0",
-                                                   "background":"#26a69a",
-                                                   "color":"white", "cursor":"pointer" }}>edit</i>
-
-                                           : <div></div>
+                                           this.state.showEdit && <i onClick={() => this.changeSection(x, x['action'])}
+                                                                     className="material-icons"
+                                                                     style={{
+                                                                       "float":"right",
+                                                                       "padding":"8.5px 3px",
+                                                                       "borderBottom":"1px solid #e0e0e0",
+                                                                       "background":"#26a69a",
+                                                                       "color":"white", "cursor":"pointer" }}>edit</i>
                                          }
                                        </div>
                                 }) : <div style={{"padding":"30px"}}>This section has no content yet, why not add some?</div>

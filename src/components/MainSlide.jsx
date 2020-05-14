@@ -7,7 +7,7 @@ export default (props) => {
     return <Slider fullscreen options={{indicators:true, interval:10000}}> {
                   props.data.map(x => {
                     return <Slide key = {x.image}
-                                  image = {<img src={x.image}/>}>
+                                  image = { <img src={x.image}/> }>
                                 <Caption style={{top:"32vh"}}>
                                   <MainSlideTop data = {x}/>
                                 </Caption>

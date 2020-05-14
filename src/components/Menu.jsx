@@ -61,13 +61,24 @@ export default class Menu extends React.Component {
           let arrs = Object.keys(this.state).filter(x => Array.isArray( this.state[x] ))
           for(let x = 0;x<arrs.length;x++) {
 
-            let fetched = res.filter(y => y['type'] == arrs[x])[0];
-            let data = fetched.data;
+            let fetched = res.filter(y => y['type'] == arrs[x]);
+            let data = fetched[0].data;
 
             switch( arrs[x] ) {
               case "main" :
+              let mainData = data.filter(x => x.page == 2)
+
+              mainData.map(a => {
+                for(let z = 0;z < fetched[0].images.length;z++) {
+                  if(a['image_id'] == fetched[0].images[z]['_id']) {
+                      a['image'] = fetched[0].images[z]['src']
+                  }
+                }
+                return a
+              })
+
               this.setState({
-                [arrs[x]]: data.filter(x => x.page == 2)
+                [arrs[x]]: mainData
               })
               break;
               case "nav" :
