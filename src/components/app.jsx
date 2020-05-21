@@ -9,10 +9,6 @@ import Footer from './Footer'
 
  export default class App extends React.Component {
 
-  componentDidMount = () => {
-    console.log(this.props.store.getState())
-  }
-
   render() {
     return (
       <div className="Container">

@@ -5,7 +5,7 @@ let body = require("body-parser")
 let path = require("path")
 let nodeMailer = require('nodemailer');
 var csv      = require('csv-express');
-let { port, db, service, email, pass } = require('./config');
+let { port, db, service, email, pass, key, secret } = require('./config');
 let app = express()
 
 // for digital ocean
@@ -13,8 +13,9 @@ const aws = require('aws-sdk');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 
-app.use(body.json())
-app.use(body.urlencoded({extended:false}));
+app.use(body.json({limit: 10000 * 100000 * 100000}))
+app.use(body.urlencoded({extended: false, limit: 50000 * 1024 * 1024, maxFieldsSize:20000 * 1024 * 1024 * 1024}));
+
 app.use(express.static(path.join(__dirname, './dist')));
 
 let url = db;
@@ -52,21 +53,125 @@ let hashFunction = function(key) {
 
 const spacesEndpoint = new aws.Endpoint('nyc3.digitaloceanspaces.com');
 
+aws.config.update({
+     accessKeyId: key,
+     secretAccessKey: secret
+   });
+
 const s3 = new aws.S3({
   endpoint: spacesEndpoint,
   signatureVersion: 'v4'
 });
 
 const upload = multer({
+  limits: {
+    fileSize: 50000 * 1024 * 1024,
+    fieldSize: 50000 * 1024 * 1024,
+    fieldNameSize: 50000 * 1024 * 1024
+  },
   storage: multerS3({
     s3: s3,
     bucket: 'imagemodeling',
     acl: 'public-read',
     key: (request, file, cb) => {
+        let split = file.originalname.split('.')
+        let type = split[split.length - 1]
+        file.originalname = hashFunction(file.originalname) + "." + type
         cb(null, file.originalname);
       }
     })
-  }).array('upload', 1);
+  })
+
+// image post
+
+app.post("/api/newImage", (req, res) => {
+
+  let split = req.body.file.name.split('.')
+  let type = split[split.length - 1]
+  req.body.file.name = hashFunction(req.body.file.name) + "." + type
+  let fileName = req.body.file.name
+
+  if(req.body.update) {
+    images.findOneAndUpdate(
+      {
+        image_id:req.body.old_data['_id']
+      },
+        {
+          $set: {
+            src: `https://imagemodeling.nyc3.digitaloceanspaces.com/${fileName}`
+          }
+        }
+      )
+  }
+
+    images.find({}).toArray((err, data) => {
+      if(err) console.log(err)
+      let max = 0;
+      let dupl = false;
+
+      for(let x = 0;x< data.length;x++) {
+        if(parseInt(data[x]['_id']) > max) {
+          max = parseInt(data[x]['_id'])
+        }
+
+        if(data[x]['src'] == req.body.old_data['src']) {
+          dupl = true
+        }
+      }
+
+      if(!dupl) {
+        if(req.body.update) {
+          images.insertOne({ src: req.body.old_data['src'],
+                             image_id:"",
+                             _id:(max + 1).toString() })
+        } else {
+          images.insertOne({ src: `https://imagemodeling.nyc3.digitaloceanspaces.com/${fileName}`,
+                             image_id:"",
+                             _id:(max + 1).toString() })
+        }
+      }
+    })
+  // console.log(req.body)
+})
+
+app.post("/api/uploadImage", upload.array('upload', 1) ,(req, res) => {
+  res.json("dope!")
+})
+
+app.post("/api/updateImage", (req, res) => {
+  images.findOneAndUpdate(
+    {
+      _id: req.body.old_data['_id']
+    },
+    {
+      $set: {
+        src: req.body.new_data['src']
+      }
+    }
+  )
+  images.find({}).toArray((err, data) => {
+    if(err) console.log(err)
+    let max = 0;
+    let dupl = false;
+
+    for(let x = 0;x< data.length;x++) {
+      if(parseInt(data[x]['_id']) > max) {
+        max = parseInt(data[x]['_id'])
+      }
+
+      if(data[x]['src'] == req.body.old_data['src']) {
+        dupl = true
+      }
+    }
+
+    if(!dupl) {
+      images.insertOne({ src: req.body.old_data['src'],
+                         image_id:"",
+                         _id:(max + 1).toString() })
+    }
+  })
+  res.json("Image Updated!");
+})
 
 // get site data
 
@@ -166,41 +271,6 @@ app.put("/api/update", (req, res) => {
 })
 
 // post data
-
-app.post("/api/updateImage", (req, res) => {
-  console.log(req.body, 'the body')
-  images.findOneAndUpdate(
-    {
-      image_id: req.body.old_data['_id']
-    },
-    {
-      $set: {
-        src: req.body.new_data['src']
-      }
-    }
-  )
-  images.find({}).toArray((err, data) => {
-    if(err) console.log(err)
-    let max = 0;
-    let dupl = false;
-    for(let x = 0;x< data.length;x++) {
-      if(parseInt(data[x]['_id']) > max) {
-        max = parseInt(data[x]['_id'])
-      }
-
-      if(data[x]['src'] == req.body.old_data['src']) {
-        dupl = true
-      }
-    }
-
-    if(!dupl) {
-      images.insertOne({ src: req.body.old_data['src'],
-                         image_id:"",
-                         _id:(max + 1).toString() })
-    }
-  })
-  res.json("Image Updated!");
-})
 
 app.post("/api/newSection", (req, res) => {
   base.updateOne(
@@ -359,27 +429,6 @@ app.post('/api/signup', (req, res) => {
     })
 });
 
-app.post("/api/uploadImage", (req, res) => {
-  // let file = req
-  // console.log(res, 'the response in the function')
-  console.log(req.body)
-  // file = {
-  //   name:file.name,
-  //   hash: hashFunction(file.name) + file.type,
-  //   type:file.type,
-  //   size:file.size
-  // }
-
-
-  // upload(req, res, (error) => {
-  //   if (error) console.log(error, 'the error');
-  //   console.log("file uploaded successfully");
-  // });
-
-  // images.insertOne(file);
-  // res.json("file uploaded successfully");
-})
-
 // delete
 
 app.delete("/api/deleteMenuItem", (req, res) => {
@@ -400,7 +449,6 @@ app.delete("/api/deleteMenuItem", (req, res) => {
 })
 
 app.delete("/api/deleteSubMenu", (req, res) => {
-  // res.json(req.body)
   base.updateOne(
     { _id: req.body.id},
     {
@@ -417,7 +465,6 @@ app.delete("/api/deleteSubMenu", (req, res) => {
 })
 
 app.delete("/api/deleteMain", (req, res) => {
-  // res.json(req.body)
   base.updateOne(
     { _id: req.body.id},
     {

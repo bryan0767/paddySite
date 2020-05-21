@@ -1,4 +1,5 @@
 @import "./styles/mainStyles";
+@import "./styles/Admin";
 @import "./styles/Specials";
 @import "./styles/Events";
 @import "./styles/Form";
@@ -31,17 +32,10 @@
 
 .fullScreen {
   height:100vh !important;
-  // width:100vw !important;
 }
 
 .menu {
   margin:0px 15px;
-}
-
-.centerHorizantal {
-  // position:relative;
-  // left:50% !important;
-  // transform:translateX(-50%);
 }
 
 .centerVertical {

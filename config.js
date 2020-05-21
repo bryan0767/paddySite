@@ -6,5 +6,7 @@ module.exports = {
   port:process.env.PORT,
   service:process.env.SERVICE,
   email:process.env.EMAIL,
-  pass:process.env.PASS
+  pass:process.env.PASS,
+  secret:process.env.SECRET,
+  key:process.env.KEY
 };

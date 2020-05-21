@@ -35,7 +35,8 @@ export default class Admin extends React.Component {
           <Button modal="close"  style={{"marginRight": "20px"}}>Close</Button>
         ],
         replacedImage:{},
-        selectedImage:{}
+        selectedImage:{},
+        selectedValue:{}
       }
     }
 
@@ -345,7 +346,7 @@ export default class Admin extends React.Component {
       }
 
       submitForm = (form) => {
-        console.log(form, 'in the submit function')
+        // console.log(form, 'in the submit function')
       }
 
       renderItemInputs = (type=false) => {
@@ -361,10 +362,51 @@ export default class Admin extends React.Component {
         } else if (this.state.section == "images") {
           return <Tabs className="tab-demo z-depth-1">
                     <Tab title="upload new">
-                      <div>these nuts</div>
+                      <div className="inputGrid">
+                      <TextInput
+                       className="fileInput"
+                       onChange={(e, image) => {
+                         if(e.currentTarget.files[0]) {
+                           let formData = new FormData();
+                           formData.append('upload', e.currentTarget.files[0])
+                           fetch("api/uploadImage", {
+                             method:"POST",
+                             body: formData
+                           }).then(res => {
+                             M.toast({html: "Image Updated!", classes: "rounded teal"})
+                             this.populateMenu({}, "default");
+                           })
+
+                           fetch("api/newImage", {
+                             method:"POST",
+                             headers: {
+                                 'Accept': 'application/json',
+                                 'Content-Type': 'application/json'
+                             },
+                             body: JSON.stringify({
+                               file: {
+                                 name: e.currentTarget.files[0].name,
+                                 lastModified: e.currentTarget.files[0].lastModified,
+                                 lastModifiedDate: e.currentTarget.files[0].lastModifiedDate,
+                                 webkitRelativePath: e.currentTarget.files[0].webkitRelativePath,
+                                 size: e.currentTarget.files[0].size,
+                                 type: e.currentTarget.files[0].type
+                               },
+                               old_data: {},
+                               update:false
+                             })
+                           })
+
+                         }
+                       }}
+                       id={`newFileInput`}
+                       label="Upload New"
+                       name="upload"
+                       type="file" />
+                      </div>
                     </Tab>
                       {
-                        this.props.data.reverse().filter(x => x.images.length > 0).map(x => {
+                        this.props.data.filter(x => x.images.length > 0).map((x, z) => {
                           return <Tab
                                   options={{
                                     duration: 300,
@@ -375,7 +417,7 @@ export default class Admin extends React.Component {
                                   title={x.type}>
                                   <div style={{ "justifyContent":"space-between", "display":"flex", "flexFlow":"row wrap" }}>
                                       {
-                                        x.images.map(y => {
+                                        x.images.map((y, a) => {
                                           return <div className=" col s4 " style={{ marginTop:"20px", display:"flex", flexDirection:"column",
                                                                                     padding:"0", maxWidth:"32%", justifyContent:"center" }}>
                                                     <img src={y.src} style={{ width:"100%", height:"auto" }}/>
@@ -394,9 +436,7 @@ export default class Admin extends React.Component {
                                                                          modalStyles={{ "display":"inline", "marginLeft":"10px"}}
                                                                          actions={
                                                                                   [<Button modal="close" onClick={() => {
-
                                                                                     // post request
-                                                                                    console.log(this.state.replacedImage, this.state.selectedImage, 'the replaced image')
                                                                                     fetch("api/updateImage", {
                                                                                       method:"POST",
                                                                                       headers: {
@@ -424,7 +464,7 @@ export default class Admin extends React.Component {
                                                               } }>Close</Button>
                                                               ]
                                                             }
-                                                            trigger={<Button style={{ "margin":"10px 0" }}>Replace</Button>}>
+                                                            trigger={<Button style={{ "marginTop":"10px" }}>Replace</Button>}>
                                                               <div style={{ "justifyContent":"space-between", "display":"flex", "flexFlow":"row wrap" }}>
                                                                 {
                                                                   this.state.images.map((x, y) => {
@@ -447,8 +487,58 @@ export default class Admin extends React.Component {
                                                                 }
                                                                 </div>
                                                     </Modal>
-                                                    // working
-                                                    <Button>Upload New</Button>
+
+                                                    <div className="inputGrid">
+                                                      <TextInput
+                                                       data-id={ y.src }
+                                                       className="fileInput"
+                                                       onChange={(e, image) => {
+                                                         this.setState({
+                                                           selectedValue: y
+                                                         })
+                                                         // let saveButton = document.getElementById(`save_${a}`)
+                                                         if(e.currentTarget.files[0]) {
+                                                           // saveButton.style.display = 'inline-block'
+                                                           let formData = new FormData();
+                                                           formData.append('upload', e.currentTarget.files[0])
+
+                                                           fetch("api/uploadImage", {
+                                                             method:"POST",
+                                                             body: formData
+                                                           }).then(res => {
+                                                             M.toast({html: "Image Updated!", classes: "rounded teal"})
+                                                             this.populateMenu({}, "default");
+                                                           })
+
+                                                           fetch("api/newImage", {
+                                                             method:"POST",
+                                                             headers: {
+                                                                 'Accept': 'application/json',
+                                                                 'Content-Type': 'application/json'
+                                                             },
+                                                             body: JSON.stringify({
+                                                               file: {
+                                                                 name: e.currentTarget.files[0].name,
+                                                                 lastModified: e.currentTarget.files[0].lastModified,
+                                                                 lastModifiedDate: e.currentTarget.files[0].lastModifiedDate,
+                                                                 webkitRelativePath: e.currentTarget.files[0].webkitRelativePath,
+                                                                 size: e.currentTarget.files[0].size,
+                                                                 type: e.currentTarget.files[0].type
+                                                               },
+                                                               old_data: y,
+                                                               update:true
+                                                             })
+                                                           })
+
+                                                         }
+                                                       }}
+                                                       id={`TextInput-${z}-${a}`}
+                                                       label="Upload New"
+                                                       name="upload"
+                                                       type="file" />
+                                                    </div>
+
+                                                     { /* <TextInput type="submit" id={`save_${a}`} style={{ display:"none" }}>Save</TextInput>  */}
 
                                                  </div>
                                         })

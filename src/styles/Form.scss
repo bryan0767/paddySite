@@ -3,33 +3,33 @@
   padding:0 !important;
 }
 
-.input-field {
-  width:100%;
-  border-radius: 10px;
-  margin:10px 0 !important;
-  padding:0 !important;
-  position: relative;
-
-    label {
-      left:2em !important;
-    }
-
-    input {
-      text-indent:20px;
-    }
-
-    .helper-text {
-      top:6px
-    }
-
-    input, textarea{
-      box-shadow: 4px 4px 0px rgba(37, 95, 46, 0.5) !important;
-      border: none !important;
-      background: #b5832714 !important;
-      color:#9c9f83 !important;
-      margin:0 !important;
-    }
-}
+// .input-field {
+//   width:100%;
+//   border-radius: 10px;
+//   margin:10px 0 !important;
+//   padding:0 !important;
+//   position: relative;
+//
+//     label {
+//       left:2em !important;
+//     }
+//
+//     input {
+//       text-indent:20px;
+//     }
+//
+//     .helper-text {
+//       top:6px
+//     }
+//
+//     input, textarea{
+//       box-shadow: 4px 4px 0px rgba(37, 95, 46, 0.5) !important;
+//       border: none !important;
+//       background: #b5832714 !important;
+//       color:#9c9f83 !important;
+//       margin:0 !important;
+//     }
+// }
 
 .contact_email {
   height:4.7em;
@@ -38,14 +38,37 @@
 .formRow {
   background:#fefbdd;
   display:flex;
-  // height:40vh;
   align-items: center;
+  .input-field {
+    width:100%;
+    border-radius: 10px;
+    margin:10px 0 !important;
+    padding:0 !important;
+    position: relative;
+
+      label {
+        left:2em !important;
+      }
+
+      input {
+        text-indent:20px;
+      }
+
+      .helper-text {
+        top:6px
+      }
+
+      input, textarea{
+        box-shadow: 4px 4px 0px rgba(37, 95, 46, 0.5) !important;
+        border: none !important;
+        background: #b5832714 !important;
+        color:#9c9f83 !important;
+        margin:0 !important;
+      }
+  }
 }
 
 .form_item {
-  // text-align:center;
-  // height:100%;
-  // position:relative;
   max-width:45% !important;
   margin:0 auto !important;
   text-align:center;
@@ -53,12 +76,6 @@
 }
 
 .form_inputs {
-  // height:60%;
-  // position:absolute;
-  // width:80%;
-  // left:50%;
-  // top:45%;
-  // transform:translate(-50%, -50%);
   margin:20px 0;
 }
 
@@ -73,22 +90,10 @@
     }
 }
 
-// .button_1 {
-//   left:0;
-// }
-
-// .button_2 {
-//   right:0;
-// }
-
 @media (max-width:600px) {
   .form_item {
     height:100%;
     width:100%;
     max-width:100% !important;
-  }
-
-  .formRow {
-    // height:50vh
   }
 }
