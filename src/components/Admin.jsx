@@ -23,11 +23,9 @@ export default class Admin extends React.Component {
         currentItem:{},
         username:"",
         password:"",
-        section:"images",
-        // section:"main",
+        section:"main",
         prices:true,
-        // validated:false,
-        validated:true,
+        validated:false,
         showEdit:false,
         display:this.defaultDisplay,
         actions:[
@@ -350,8 +348,6 @@ export default class Admin extends React.Component {
       }
 
       renderItemInputs = (type=false) => {
-        // let replacedImage;
-        // let selectedImage;
 
         if(this.state.section == "settings" ) {
           return <div style={{"margin":"20px 0"}}>
@@ -362,7 +358,7 @@ export default class Admin extends React.Component {
         } else if (this.state.section == "images") {
           return <Tabs className="tab-demo z-depth-1">
                     <Tab title="upload new">
-                      <div className="inputGrid">
+                      <div className="inputGrid" style={{ width:"200px", margin:"40px auto" }}>
                       <TextInput
                        className="fileInput"
                        onChange={(e, image) => {
