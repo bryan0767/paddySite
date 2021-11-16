@@ -14,7 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@babel/plugin-proposal-class-properties": "^7.2.3",
-    "aws-sdk": "^2.636.0",
+    "aws-sdk": "^2.814.0",
     "body-parser": "^1.18.3",
     "csv-express": "^1.2.2",
     "dotenv": "^8.2.0",
